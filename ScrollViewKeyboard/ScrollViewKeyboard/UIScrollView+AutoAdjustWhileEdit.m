@@ -50,8 +50,16 @@ static NSString * const kAutoAdjustSwitchKey = @"AutoAdjustSwitchKey";
     CGRect textFieldFrame = [self convertRect:textField.frame fromView:textField.superview];
     CGFloat maxY = CGRectGetMaxY(textFieldFrame);
     
-    if (self.contentOffset.y < keyboardHeigth + maxY - self.frame.size.height) {
-        [self setContentOffset:CGPointMake(0, keyboardHeigth + maxY - self.frame.size.height) animated:NO];
+    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
+    CGRect selfRect = [keyWindow convertRect:self.frame fromView:self.superview];
+    // scrollView 距屏幕底部的间距
+    CGFloat bottomMarge = keyWindow.frame.size.height - CGRectGetMaxY(selfRect);
+    
+    CGFloat coverHeight = keyboardHeigth - bottomMarge;
+    CGFloat adjustContentOffsetY = coverHeight + maxY - self.frame.size.height;
+    
+    if (self.contentOffset.y < adjustContentOffsetY ) {
+        [self setContentOffset:CGPointMake(0, adjustContentOffsetY) animated:NO];
     }
 }
 
