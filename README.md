@@ -4,7 +4,7 @@
 
 ## 适用场景
 
-适用于 UIScroollView 的子视图中有 UItextField 或者 UITextView 并且键盘弹出后其会被遮挡住的情况。比如 UItextField 或者 UITextView 直接加到 UIScroollView 上，或者 UITableView 的 cell 中有 UItextField 或者 UITextView。
+适用于 UIScroollView 的子视图中有 UItextField 或者 UITextView 并且键盘弹出后其会被遮挡住的情况。比如 UItextField 或者 UITextView 直接加到 UIScroollView 上，或者 UITableView 的 cell 中有 UItextField 或者 UITextView。
 
 ## 使用
 
@@ -29,13 +29,13 @@ dealloc 中设置属性 isAutoAdjust 为 NO 。
 
 ## 实现思路
 
-我们在做需求的时候难免会遇到下面这种输入表格。让我们比较头疼的就是怎么不让键盘挡住我们正在输入的文本框。
+我们在做需求的时候难免会遇到下面这种输入表格。让我们比较头疼的就是怎么不让键盘挡住我们正在输入的文本框。
 
 ![](./image1.png)
 
-之前我用的方法都是在文本框的代理方法中进行处理，但是处理起来相当麻烦，而且写出来的代码也比较难看。后来又通过监听键盘弹出收起的通知来挨个处理，也比较麻烦。有没有什么简单的方法呢？
+之前我用的方法都是在文本框的代理方法中进行处理，但是处理起来相当麻烦，而且写出来的代码也比较难看。后来又通过监听键盘弹出收起的通知来挨个处理，也比较麻烦。有没有什么简单的方法呢？
 
-其实解决的思路涉及到三个知识点。
+其实解决的思路涉及到三个知识点。
 1. 键盘通知
 2. 获取当前第一响应者
 3. UIView 的坐标转换
@@ -65,7 +65,7 @@ dealloc 中设置属性 isAutoAdjust 为 NO 。
 
 通过遍历当前UIWindow的所有子视图，从而找到当前的第一响应者。
 
-缺点就是需要自己写很多的递归调用，还需要去处响应者链条上的非 UIView 类。
+缺点就是需要自己写很多的递归调用，还需要去除响应者链条上的非 UIView 类。
 
 2. 私有 API
 可以通过下面的方法来获取。
@@ -73,13 +73,13 @@ dealloc 中设置属性 isAutoAdjust 为 NO 。
 UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
 UIView *firstResponder = [keyWindow performSelector:@selector(firstResponder)];
 ```
-缺点是苹果不让用这种私有 API。而且这些 API 可能随时被废弃掉。
+缺点是苹果不让用这种私有 API。而且这些 API 可能随时被废弃掉。
 
 3. UIResponder 方法
 
-这是 [这篇文章](https://www.jianshu.com/p/84c0eddf2378) 中作者提出的方法，很是好用。
+这是 [这篇文章](https://www.jianshu.com/p/84c0eddf2378) 中作者提出的方法，很是好用。
 
-基本是来说就是利用了 UIResponder 方法
+基本是来说就是利用了 UIResponder 方法
 
 ```
 - (BOOL)sendAction:(SEL)action to:(id)target from:(id)sender forEvent:(UIEvent *)event
@@ -92,13 +92,13 @@ UIView *firstResponder = [keyWindow performSelector:@selector(firstResponder)];
 完美。
 
 ### UIView 的坐标转换
-这是 UIView 的方法，可以转换 view 的坐标到相应的 view 中去。
+这是 UIView 的方法，可以转换 view 的坐标到相应的 view 中去。
 
 ```
 - (CGRect)convertRect:(CGRect)rect fromView:(UIView *)view;
 ```
 
-比如上面图片中的 UItextField 的父视图是 cell 的 contentView。 想要获取 UItextField 在 UITableView 中相对位置就需要做如下的转换
+比如上面图片中的 UItextField 的父视图是 cell 的 contentView。 想要获取 UItextField 在 UITableView 中相对位置就需要做如下的转换
 
 ```
 [self.tableView convertRect:textField.frame fromView:textField.superview];
@@ -118,9 +118,9 @@ UIView *firstResponder = [keyWindow performSelector:@selector(firstResponder)];
 
 额外需要说明两点
 
-1. 其实还可以通过 Method Swizzling 来替换 dealloc 方法，移除监听。但是这样有额外的风险，用在这里有点小题大做了。
+1. 其实还可以通过 Method Swizzling 来替换 dealloc 方法，移除监听。但是这样有额外的风险，用在这里有点小题大做了。
 
-2. 在 iOS 某个版本后通知的监听不移除也不会出现问题。我试验了 iOS11 和 iOS12 都不会有问题。但是...安全起见还是加上移除监听的代码吧。（[这篇文章](https://juejin.im/entry/5a8fe5c551882518c0797ebe)有详细的说明）
+2. 在 iOS 某个版本后通知的监听不移除也不会出现问题。我试验了 iOS11 和 iOS12 都不会有问题。但是...安全起见还是加上移除监听的代码吧。（[这篇文章](https://juejin.im/entry/5a8fe5c551882518c0797ebe)有详细的说明）
 
 ## 参考
 1. [一行代码获取当前响应链的First Responder](https://www.jianshu.com/p/84c0eddf2378)
