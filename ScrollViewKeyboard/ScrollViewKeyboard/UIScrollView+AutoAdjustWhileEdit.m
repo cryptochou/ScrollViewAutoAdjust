@@ -29,7 +29,9 @@ static NSString * const kAutoAdjustSwitchKey = @"AutoAdjustSwitchKey";
                                                      name:UIKeyboardWillHideNotification
                                                    object:nil];
     } else {
-        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+        
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
     }
 }
 
