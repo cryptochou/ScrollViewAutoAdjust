@@ -55,7 +55,9 @@ static NSString * const kAutoAdjustSwitchKey = @"AutoAdjustSwitchKey";
     // scrollView 距屏幕底部的间距
     CGFloat bottomMarge = keyWindow.frame.size.height - CGRectGetMaxY(selfRect);
     
+    // 会被遮挡的高度
     CGFloat coverHeight = keyboardHeigth - bottomMarge;
+    // 要完全显示时需要调整的 contentOffset y
     CGFloat adjustContentOffsetY = coverHeight + maxY - self.frame.size.height;
     
     if (self.contentOffset.y < adjustContentOffsetY ) {
