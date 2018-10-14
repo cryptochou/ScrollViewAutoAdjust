@@ -114,7 +114,46 @@ UIView *firstResponder = [keyWindow performSelector:@selector(firstResponder)];
 
 然后在收到通知后获取第一响应者和坐标，然后调整 scrollView 的 contentOffset。
 
-具体实现可以看下代码。
+```
+- (void)keyboardWillShow:(NSNotification *)notice
+{
+    if (!self.isAutoAdjust) return;
+    
+    NSValue *aValue = [notice.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey];
+    CGRect keyboardRect = [aValue CGRectValue];
+    CGFloat keyboardHeigth = keyboardRect.size.height;
+    
+    UIView *textField = [UIResponder getCurrentFirstResponder];
+    CGRect textFieldFrame = [self convertRect:textField.frame fromView:textField.superview];
+    CGFloat maxY = CGRectGetMaxY(textFieldFrame);
+    
+    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
+    CGRect selfRect = [keyWindow convertRect:self.frame fromView:self.superview];
+    // scrollView 距屏幕底部的间距
+    CGFloat bottomMarge = keyWindow.frame.size.height - CGRectGetMaxY(selfRect);
+    
+    // 会被遮挡的高度
+    CGFloat coverHeight = keyboardHeigth - bottomMarge;
+    // 要完全显示时需要调整的 contentOffset y
+    CGFloat adjustContentOffsetY = coverHeight + maxY - self.frame.size.height;
+    
+    if (self.contentOffset.y < adjustContentOffsetY ) {
+        [self setContentOffset:CGPointMake(0, adjustContentOffsetY) animated:NO];
+    }
+}
+```
+
+键盘收起的时候如果之前滚动的 contentOffset 超出了最大值需要从新调整下 contentOffset。
+```
+- (void)keyboardWillHide:(NSNotification *)notice
+{
+    if (!self.isAutoAdjust) return;
+    
+    if (self.contentOffset.y > self.contentSize.height - self.frame.size.height) {
+        [self setContentOffset:CGPointMake(0, self.contentSize.height - self.frame.size.height) animated:YES];
+    }
+}
+```
 
 额外需要说明两点
 
