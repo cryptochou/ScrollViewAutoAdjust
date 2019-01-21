@@ -155,7 +155,7 @@ UIView *firstResponder = [keyWindow performSelector:@selector(firstResponder)];
 }
 ```
 
-额外需要说明两点
+## 额外说明
 
 1. 其实还可以通过 Method Swizzling 来替换 dealloc 方法，移除监听。但是这样有额外的风险，用在这里有点小题大做了。
 
